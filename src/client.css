@@ -11,6 +11,11 @@ body {
     height: 100vh;
 }
 
+* {
+  scrollbar-width: initial;
+  scrollbar-color: #00ccff transparent;
+}
+
 h1 {
     margin-bottom: 30px;
     font-size: 2rem;
@@ -74,17 +79,29 @@ h1 {
     color: white;
 }
 
-.chat-input button {
+.chat-input .icon-button {
     background-color: #00ccff;
     border: none;
     color: black;
     border-radius: 50%;
     width: 40px;
     height: 40px;
-    margin-left: 10px;
     cursor: pointer;
     font-size: 1.2em;
+    margin-left: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0 0 0.2rem; /* importante para evitar desajustes */
 }
+
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
 
 /* Tablets y móviles grandes */
 @media (max-width: 768px) {

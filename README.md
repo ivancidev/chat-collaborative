@@ -1,57 +1,55 @@
-# Chat Colaborativo con WebSocket
+# Chat Colaborativo WebSocket
 
-Este es un proyecto de chat colaborativo que utiliza WebSocket para la comunicación en tiempo real.
+## Requisitos
 
-## Requisitos Previos
-
-- Python 3.8 o superior
+- Python 3.7 o superior
 - pip (gestor de paquetes de Python)
+- Git
 
-## Instalación de Python
+## Instalación
 
-### Windows
-
-1. Visita la página oficial de Python: https://www.python.org/downloads/
-2. Descarga la última versión de Python para Windows
-3. Ejecuta el instalador
-4. **Importante**: Marca la casilla "Add Python to PATH" durante la instalación
-5. Completa la instalación
-
-### Verificar la instalación
-
-Abre una terminal (PowerShell o CMD) y ejecuta:
+1. Clonar el repositorio:
 
 ```bash
-python --version
-pip --version
-```
-
-## Instalación del Proyecto
-
-1. Clona este repositorio:
-
-```bash
-git clone [URL_DEL_REPOSITORIO]
+git clone https://github.com/ivancidev/chat-collaborative
 cd chat-colaborativo-websocket-python
 ```
 
-2. Instala las dependencias:
+2. Crear y activar entorno virtual:
+
+En Windows:
+
+```bash
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+En Linux/Mac:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Instalar todas las dependencias del proyecto:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Ejecutar el Proyecto
+## Ejecución
 
-1. Inicia el servidor:
+1. Asegúrate de que el entorno virtual esté activado (verás `(venv)` al inicio de tu línea de comandos)
+
+2. Iniciar el servidor:
 
 ```bash
-python server.py
+python src/server.py
 ```
 
-Veras en tu temrinal la siguiente salida:
+El servidor WebSocket estará corriendo en `ws://localhost:12345`
 
-```
-Hello World!
-```
+## Notas
 
+- Para desactivar el entorno virtual cuando termines, simplemente escribe `deactivate` en la terminal
+- Si cierras la terminal, necesitarás activar el entorno virtual nuevamente usando los comandos del paso 2

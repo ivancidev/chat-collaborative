@@ -11,7 +11,7 @@
 <body>
     <h1>Chat Colaborativo en Tiempo Real</h1>
     <div class="chat-container">
-        <div class="chat-messages">
+        <div class="chat-messages" id="chatMessages">
             <div class="message">
                 <span class="author">Iván</span> <span class="time">10:05 a.m.</span><br>
                 Texto de chat
@@ -26,10 +26,38 @@
             </div>
         </div>
         <div class="chat-input">
-            <input type="text" placeholder="Escribe aquí" disabled />
-            <button disabled>▶</button>
+            <input type="text" placeholder="Escribe aquí" id="chatInput" />
+            <button id="sendButton">▶</button>
         </div>
     </div>
+
+    <script>
+        const input = document.getElementById('chatInput');
+        const button = document.getElementById('sendButton');
+        const messages = document.getElementById('chatMessages');
+
+        button.addEventListener('click', () => {
+            const text = input.value.trim();
+            if (text === '') return;
+
+            const now = new Date();
+            const hour = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const time = `${hour}:${minutes}`;
+
+            const message = document.createElement('div');
+            message.classList.add('message');
+            message.innerHTML = `<span class="author">Tú</span> <span class="time">${time}</span><br>${text}`;
+            messages.appendChild(message);
+
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight; // Scroll automático abajo
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') button.click();
+        });
+    </script>
 </body>
 
 </html>

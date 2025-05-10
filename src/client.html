@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Colaborativo</title>
+    <link rel="stylesheet" href="client.css">
+</head>
+
+<body>
+    <h1>Chat Colaborativo en Tiempo Real</h1>
+    <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+            <div class="message">
+                <span class="author">Iván</span> <span class="time">10:05 a.m.</span><br>
+                Texto de chat
+            </div>
+            <div class="message">
+                <span class="author">Josué</span> <span class="time">10:14 a.m.</span><br>
+                Texto de chat largo
+            </div>
+            <div class="message">
+                <span class="author">Isaac</span> <span class="time">10:20 a.m.</span><br>
+                Texto de chat
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="Escribe aquí" id="chatInput" />
+            <button id="sendButton" class="icon-button">
+                <svg width="19" height="16" viewBox="0 0 19 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 16V0L19 8L0 16ZM2 13L13.85 8L2 3V6.5L8 8L2 9.5V13ZM2 13V8V3V6.5V9.5V13Z" fill="white" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('chatInput');
+        const button = document.getElementById('sendButton');
+        const messages = document.getElementById('chatMessages');
+
+        button.addEventListener('click', () => {
+            const text = input.value.trim();
+            if (text === '') return;
+
+            const now = new Date();
+            const hour = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const time = `${hour}:${minutes}`;
+
+            const message = document.createElement('div');
+            message.classList.add('message');
+            message.innerHTML = `<span class="author">Tú</span> <span class="time">${time}</span><br>${text}`;
+            messages.appendChild(message);
+
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight; // Scroll automático abajo
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') button.click();
+        });
+    </script>
+</body>
+
+</html>

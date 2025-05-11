@@ -38,106 +38,70 @@
     </div>
 
     <script>
-        //Esta parte asegura que js se ejecute despues de html
         window.addEventListener('DOMContentLoaded', () => {
 
-        const input = document.getElementById('chatInput');
-        const button = document.getElementById('sendButton');
-        const messages = document.getElementById('chatMessages');
+            const input = document.getElementById('chatInput');
+            const button = document.getElementById('sendButton');
+            const messages = document.getElementById('chatMessages');
 
-        button.addEventListener('click', () => {
-            const text = input.value.trim();
-            if (text === '') return;
+            // Establecer conexión con el servidor WebSocket
+            const socket = new WebSocket('ws://localhost:12345');
 
-            const now = new Date();
-            const hour = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const time = `${hour}:${minutes}`;
+            socket.addEventListener('open', () => {
+                console.log('Conectado al servidor WebSocket.');
 
-            const message = document.createElement('div');
-            message.classList.add('message');
-            message.innerHTML = `<span class="author">Tú</span> <span class="time">${time}</span><br>${text}`;
-            messages.appendChild(message);
+                const now = new Date();
+                const hour = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const time = `${hour}:${minutes}`;
 
-            input.value = '';
-            messages.scrollTop = messages.scrollHeight; // Scroll automático abajo
-        });
-
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') button.click();
-        });
-
-        //Aqui se establece la conexion Websocket con el server
-        const socket = new WebSocket('ws://localhost:12345');
-
-        //Cuando se abre el cliente, con esto se muestra un mensaje
-        socket.addEventListener('open', () => {
-            console.log('Conectado al servidor WebSocket.');
-            //Aqui se genera la hora
-            const now = new Date();
-            const hour = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const time = `${hour}:${minutes}`;
-
-            //Aqui se crea y muestra el mensaje
-            const message = document.createElement('div');
-            message.classList.add('message');
-            message.innerHTML = `<span class="author">Sistema</span> <span class="time">${time}</span><br>Conectado al servidor con éxito.`;
-            messages.appendChild(message);
-            messages.scrollTop = messages.scrollHeight;
+                const message = document.createElement('div');
+                message.classList.add('message');
+                message.innerHTML = `<span class="author">Sistema</span> <span class="time">${time}</span><br>Conectado al servidor con éxito.`;
+                messages.appendChild(message);
+                messages.scrollTop = messages.scrollHeight;
             });
 
-        //aqui se muestra el mensaje con hora...modificar para que se vea el mensaje de otros clientes, o adaptar server
-        socket.addEventListener('message', (event) => {
-            
-            const now = new Date();
-            const hour = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const time = `${hour}:${minutes}`;
+            // Recibir mensajes del servidor
+            socket.addEventListener('message', (event) => {
+                const now = new Date();
+                const hour = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const time = `${hour}:${minutes}`;
 
-            const message = document.createElement('div');
-            message.classList.add('message');
-            message.innerHTML = `<span class="author">Servidor</span> <span class="time">${time}</span><br>${event.data}`;
-            messages.appendChild(message);
-            messages.scrollTop = messages.scrollHeight;
+                const message = document.createElement('div');
+                message.classList.add('message');
+                message.innerHTML = `<span class="author">Usuario</span> <span class="time">${time}</span><br>${event.data}`;
+                messages.appendChild(message);
+                messages.scrollTop = messages.scrollHeight;
             });
 
-        //Aqui se muestra mensaje en consola cuando se cierra conexion
-        socket.addEventListener('close', () => {
-            console.log('Conexión cerrada por el servidor.');
+            // Manejar cierre de conexión
+            socket.addEventListener('close', () => {
+                console.log('Conexión cerrada por el servidor.');
             });
-        
-        //Aqui se captura y muestra errores en la conexion
-        socket.addEventListener('error', (error) => {
-            console.error('WebSocket error:', error);
+
+            // Manejar errores
+            socket.addEventListener('error', (error) => {
+                console.error('WebSocket error:', error);
             });
-        
-         //se envía el mensaje al servidor WebSocket
 
-        button.addEventListener('click', () => {
-            //Se obtiene mensaje
-            const text = input.value.trim();
-            if (text === '') return;
-            
-            //Se obtiene hora:
-            const now = new Date();
-            const hour = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const time = `${hour}:${minutes}`;
+            // Enviar mensaje al servidor
+            button.addEventListener('click', () => {
+                const text = input.value.trim();
+                if (text === '') return;
 
-            // Crear y mostrar el mensaje del usuario en el chat
-            const message = document.createElement('div');
-            message.classList.add('message');
-            message.innerHTML = `<span class="author">Tú</span> <span class="time">${time}</span><br>${text}`;
-            messages.appendChild(message);
-            messages.scrollTop = messages.scrollHeight;
+                socket.send(text); // Solo se envía, no se muestra localmente
+                input.value = '';
+            });
 
-            socket.send(text);
-
-            input.value = '';
-        });
+            // Enviar al presionar Enter
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') button.click();
+            });
         });
     </script>
+
 </body>
 
 </html>

@@ -50,6 +50,7 @@ h1 {
     margin-bottom: 10px;
     width: fit-content;
     max-width: 80%;
+    word-break: break-word;
 }
 
 .message .author {

@@ -6,26 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Colaborativo</title>
     <link rel="stylesheet" href="client.css">
+    <style>
+        /* Estilos adicionales para mensajes del sistema */
+        .message.system {
+            color: #666;
+            font-style: italic;
+        }
+        .message.system .author {
+            color: #666;
+        }
+    </style>
 </head>
 
 <body>
     <h1>Chat Colaborativo en Tiempo Real</h1>
     <div class="chat-container">
         <div class="chat-messages" id="chatMessages">
-            <!--
-            <div class="message">
-                <span class="author">Iván</span> <span class="time">10:05 a.m.</span><br>
-                Texto de chat
-            </div>
-            <div class="message">
-                <span class="author">Josué</span> <span class="time">10:14 a.m.</span><br>
-                Texto de chat largo
-            </div>
-            <div class="message">
-                <span class="author">Isaac</span> <span class="time">10:20 a.m.</span><br>
-                Texto de chat
-            </div>-->
-    
+            <!-- Mensajes aparecerán aquí -->
         </div>
         <div class="chat-input">
             <input type="text" placeholder="Escribe aquí" id="chatInput" />
@@ -50,16 +47,14 @@
             if (!username || username.trim() === '') {
                 // Si el nombre está vacío, genera uno automáticamente
                 const randomId = Math.floor(Math.random() * 999) + 1;
-                // Se asigna un nombre de usuario por defecto con un número aleatorio
                 username = `Usuario_${randomId}`;
             }
 
             // Establecer conexión con el servidor WebSocket
             const socket = new WebSocket('ws://localhost:12345');
 
-            socket.addEventListener('open', () => {
-                console.log('Conectado al servidor WebSocket.');
-
+            // Función para agregar mensaje al chat
+            function addMessage(author, content, isSystem = false) {
                 const now = new Date();
                 const hour = now.getHours().toString().padStart(2, '0');
                 const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -67,32 +62,9 @@
 
                 const message = document.createElement('div');
                 message.classList.add('message');
-                message.innerHTML = `<span class="author">Sistema</span> <span class="time">${time}</span><br>Conectado al servidor con éxito.`;
-                messages.appendChild(message);
-                messages.scrollTop = messages.scrollHeight;
-            });
-
-            // Recibir mensajes del servidor
-            socket.addEventListener('message', (event) => {
-                const now = new Date();
-                const hour = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const time = `${hour}:${minutes}`;
-
-                let author = 'Desconocido';
-                let content = event.data;
-
-                if (event.data.includes(':')) {
-                    const parts = event.data.split(':');
-                    author = parts.shift().trim();
-                    content = parts.join(':').trim(); // Preserva los ':' en el mensaje
-                }
-
-                const message = document.createElement('div');
-                message.classList.add('message');
-
-                // Identificar si es el propio usuario
-                if (author === username) {
+                if (isSystem) {
+                    message.classList.add('system');
+                } else if (author === username) {
                     message.classList.add('self');
                 } else {
                     message.classList.add('other');
@@ -101,16 +73,54 @@
                 message.innerHTML = `<span class="author">${author}</span> <span class="time">${time}</span><br>${content}`;
                 messages.appendChild(message);
                 messages.scrollTop = messages.scrollHeight;
+            }
+
+            socket.addEventListener('open', () => {
+                console.log('Conectado al servidor WebSocket.');
+                addMessage('Sistema', 'Conectado al servidor con éxito.', true);
+                
+                // Notificar a todos que un nuevo usuario se ha unido
+                socket.send(JSON.stringify({
+                    type: 'system',
+                    event: 'join',
+                    username: username
+                }));
+            });
+
+            // Recibir mensajes del servidor
+            socket.addEventListener('message', (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'system') {
+                        // Mensaje del sistema (entrada/salida de usuarios)
+                        if (data.event === 'join') {
+                            addMessage('Sistema', `${data.username} se ha unido al chat.`, true);
+                        } else if (data.event === 'leave') {
+                            addMessage('Sistema', `${data.username} ha abandonado el chat.`, true);
+                        }
+                    } else {
+                        // Mensaje normal de chat
+                        addMessage(data.author, data.content);
+                    }
+                } catch (e) {
+                    // Si no es JSON, manejar como mensaje antiguo (para compatibilidad)
+                    const parts = event.data.split(':');
+                    const author = parts.shift().trim();
+                    const content = parts.join(':').trim();
+                    addMessage(author, content);
+                }
             });
 
             // Manejar cierre de conexión
             socket.addEventListener('close', () => {
-                console.log('Conexión cerrada por el servidor.');
+                addMessage('Sistema', 'Has sido desconectado del servidor.', true);
             });
 
             // Manejar errores
             socket.addEventListener('error', (error) => {
                 console.error('WebSocket error:', error);
+                addMessage('Sistema', 'Error de conexión con el servidor.', true);
             });
 
             // Enviar mensaje al servidor
@@ -118,8 +128,13 @@
                 const text = input.value.trim();
                 if (text === '') return;
 
-                const fullMessage = `${username}: ${text}`;
-                socket.send(fullMessage);
+                const message = {
+                    type: 'message',
+                    author: username,
+                    content: text
+                };
+                
+                socket.send(JSON.stringify(message));
                 input.value = '';
             });
 
@@ -127,9 +142,18 @@
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') button.click();
             });
+
+            // Notificar al servidor cuando el usuario cierra la página
+            window.addEventListener('beforeunload', () => {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'system',
+                        event: 'leave',
+                        username: username
+                    }));
+                }
+            });
         });
     </script>
-
 </body>
-
 </html>

@@ -39,10 +39,15 @@
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-
             const input = document.getElementById('chatInput');
             const button = document.getElementById('sendButton');
             const messages = document.getElementById('chatMessages');
+
+            let username = prompt('Ingresa tu nombre de usuario:');
+            if (!username || username.trim() === '') {
+                const randomId = Math.floor(Math.random() * 999) + 1;
+                username = `Usuario_${randomId}`;
+            }
 
             // Establecer conexión con el servidor WebSocket
             const socket = new WebSocket('ws://localhost:12345');
@@ -69,9 +74,18 @@
                 const minutes = now.getMinutes().toString().padStart(2, '0');
                 const time = `${hour}:${minutes}`;
 
+                let author = 'Desconocido';
+                let content = event.data;
+
+                if (event.data.includes(':')) {
+                    const parts = event.data.split(':');
+                    author = parts.shift().trim();
+                    content = parts.join(':').trim(); // Preserva los ':' en el mensaje
+                }
+
                 const message = document.createElement('div');
                 message.classList.add('message');
-                message.innerHTML = `<span class="author">Usuario</span> <span class="time">${time}</span><br>${event.data}`;
+                message.innerHTML = `<span class="author">${author}</span> <span class="time">${time}</span><br>${content}`;
                 messages.appendChild(message);
                 messages.scrollTop = messages.scrollHeight;
             });
@@ -91,7 +105,8 @@
                 const text = input.value.trim();
                 if (text === '') return;
 
-                socket.send(text); // Solo se envía, no se muestra localmente
+                const fullMessage = `${username}: ${text}`;
+                socket.send(fullMessage);
                 input.value = '';
             });
 

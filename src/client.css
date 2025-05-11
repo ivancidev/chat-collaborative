@@ -102,6 +102,20 @@ h1 {
   fill: white;
 }
 
+.message.self {
+    background-color: #005c78; /* o cualquier color para diferenciar tus mensajes */
+    align-self: flex-end;
+    margin-left: auto;
+    text-align: right;
+}
+
+.message.other {
+    background-color: #444; /* o cualquier otro color para los demás */
+    align-self: flex-start;
+    margin-right: auto;
+    text-align: left;
+}
+
 
 /* Tablets y móviles grandes */
 @media (max-width: 768px) {

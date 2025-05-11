@@ -43,9 +43,14 @@
             const button = document.getElementById('sendButton');
             const messages = document.getElementById('chatMessages');
 
+            // Solicita al usuario que ingrese su nombre al cargar la página
             let username = prompt('Ingresa tu nombre de usuario:');
+
+            // Verifica si el usuario no ingresó nada o solo espacios
             if (!username || username.trim() === '') {
+                // Si el nombre está vacío, genera uno automáticamente
                 const randomId = Math.floor(Math.random() * 999) + 1;
+                // Se asigna un nombre de usuario por defecto con un número aleatorio
                 username = `Usuario_${randomId}`;
             }
 
@@ -85,6 +90,14 @@
 
                 const message = document.createElement('div');
                 message.classList.add('message');
+
+                // Identificar si es el propio usuario
+                if (author === username) {
+                    message.classList.add('self');
+                } else {
+                    message.classList.add('other');
+                }
+
                 message.innerHTML = `<span class="author">${author}</span> <span class="time">${time}</span><br>${content}`;
                 messages.appendChild(message);
                 messages.scrollTop = messages.scrollHeight;

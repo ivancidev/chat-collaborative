@@ -32,7 +32,7 @@ pip --version
 
 ```bash
 git clone [URL_DEL_REPOSITORIO]
-cd chat-colaborativo-websocket-python
+cd chat-collaborative
 ```
 
 2. Instala las dependencias:

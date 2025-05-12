@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Colaborativo</title>
+    <link rel="stylesheet" href="client.css" />
+    <style>
+      /* Estilos adicionales para mensajes del sistema */
+      .message.system {
+        color: #666;
+        font-style: italic;
+      }
+      .message.system .author {
+        color: #666;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Chat Colaborativo en Tiempo Real con Websocket</h1>
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <!-- Mensajes aparecerán aquí -->
+      </div>
+      <div class="chat-input">
+        <input type="text" placeholder="Escribe aquí" id="chatInput" />
+        <button id="sendButton" class="icon-button">
+          <svg
+            width="19"
+            height="16"
+            viewBox="0 0 19 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 16V0L19 8L0 16ZM2 13L13.85 8L2 3V6.5L8 8L2 9.5V13ZM2 13V8V3V6.5V9.5V13Z"
+              fill="white"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const input = document.getElementById("chatInput");
+        const button = document.getElementById("sendButton");
+        const messages = document.getElementById("chatMessages");
+
+        // Solicita al usuario que ingrese su nombre al cargar la página
+        let username = prompt("Ingresa tu nombre de usuario:");
+
+        // Verifica si el usuario no ingresó nada o solo espacios
+        if (!username || username.trim() === "") {
+          // Si el nombre está vacío, genera uno automáticamente
+          const randomId = Math.floor(Math.random() * 999) + 1;
+          username = `Usuario_${randomId}`;
+        }
+
+        // Establecer conexión con el servidor WebSocket
+        const socket = new WebSocket("ws://localhost:12345");
+
+        // Función para agregar mensaje al chat
+        function addMessage(author, content, isSystem = false) {
+          const now = new Date();
+          const hour = now.getHours().toString().padStart(2, "0");
+          const minutes = now.getMinutes().toString().padStart(2, "0");
+          const time = `${hour}:${minutes}`;
+
+          const message = document.createElement("div");
+          message.classList.add("message");
+          if (isSystem) {
+            message.classList.add("system");
+          } else if (author === username) {
+            message.classList.add("self");
+          } else {
+            message.classList.add("other");
+          }
+
+          message.innerHTML = `<span class="author">${author}</span> <span class="time">${time}</span><br>${content}`;
+          messages.appendChild(message);
+          messages.scrollTop = messages.scrollHeight;
+        }
+
+        socket.addEventListener("open", () => {
+          console.log("Conectado al servidor WebSocket.");
+          addMessage("Sistema", "Conectado al servidor con éxito.", true);
+
+          // Notificar a todos que un nuevo usuario se ha unido
+          socket.send(
+            JSON.stringify({
+              type: "system",
+              event: "conectado",
+              username: username,
+            })
+          );
+        });
+
+        // Recibir mensajes del servidor
+        socket.addEventListener("message", (event) => {
+          try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === "system") {
+              // Mensaje del sistema (entrada/salida de usuarios)
+              if (data.event === "conectado") {
+                addMessage(
+                  "Sistema",
+                  `${data.username} se ha unido al chat.`,
+                  true
+                );
+              } else if (data.event === "desconectado") {
+                addMessage(
+                  "Sistema",
+                  `${data.username} ha abandonado el chat.`,
+                  true
+                );
+              }
+            } else {
+              // Mensaje normal de chat
+              addMessage(data.author, data.content);
+            }
+          } catch (e) {
+            // Si no es JSON, manejar como mensaje antiguo (para compatibilidad)
+            const parts = event.data.split(":");
+            const author = parts.shift().trim();
+            const content = parts.join(":").trim();
+            addMessage(author, content);
+          }
+        });
+
+        // Manejar cierre de conexión
+        socket.addEventListener("close", () => {
+          addMessage("Sistema", "Has sido desconectado del servidor.", true);
+        });
+
+        // Manejar errores
+        socket.addEventListener("error", (error) => {
+          console.error("WebSocket error:", error);
+          addMessage("Sistema", "Error de conexión con el servidor.", true);
+        });
+
+        // Enviar mensaje al servidor
+        button.addEventListener("click", () => {
+          const text = input.value.trim();
+          if (text === "") return;
+
+          const message = {
+            type: "message",
+            author: username,
+            content: text,
+          };
+
+          socket.send(JSON.stringify(message));
+          input.value = "";
+        });
+
+        // Enviar al presionar Enter
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") button.click();
+        });
+
+        // Notificar al servidor cuando el usuario cierra la página
+        window.addEventListener("beforeunload", () => {
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.send(
+              JSON.stringify({
+                type: "system",
+                event: "desconectado",
+                username: username,
+              })
+            );
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

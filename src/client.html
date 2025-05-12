@@ -82,7 +82,7 @@
                 // Notificar a todos que un nuevo usuario se ha unido
                 socket.send(JSON.stringify({
                     type: 'system',
-                    event: 'join',
+                    event: 'conectado',
                     username: username
                 }));
             });
@@ -94,9 +94,9 @@
                     
                     if (data.type === 'system') {
                         // Mensaje del sistema (entrada/salida de usuarios)
-                        if (data.event === 'join') {
+                        if (data.event === 'conectado') {
                             addMessage('Sistema', `${data.username} se ha unido al chat.`, true);
-                        } else if (data.event === 'leave') {
+                        } else if (data.event === 'desconectado') {
                             addMessage('Sistema', `${data.username} ha abandonado el chat.`, true);
                         }
                     } else {
@@ -148,7 +148,7 @@
                 if (socket.readyState === WebSocket.OPEN) {
                     socket.send(JSON.stringify({
                         type: 'system',
-                        event: 'leave',
+                        event: 'desconectado',
                         username: username
                     }));
                 }

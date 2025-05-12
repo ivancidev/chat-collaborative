@@ -24,7 +24,7 @@ async def handler(websocket):
                 if data.get('type') == 'system':
                     # Notificar a todos sobre conexión/desconexión
                     await broadcast(json.dumps(data))
-                    print(f"Sistema: {data['username']} {data['event']}ed")
+                    print(f"Sistema: {data['username']} {data['event']}")
                 else:
                     # Reenviar mensaje normal a todos
                     await broadcast(message)

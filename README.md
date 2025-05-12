@@ -12,7 +12,7 @@
 
 ```bash
 git clone https://github.com/ivancidev/chat-collaborative
-cd chat-colaborativo-websocket-python
+cd chat-collaborative
 ```
 
 2. Crear y activar entorno virtual:
@@ -20,15 +20,25 @@ cd chat-colaborativo-websocket-python
 En Windows:
 
 ```bash
+# Crear el entorno virtual
 python -m venv venv
+
+# Activar el entorno virtual
 .\venv\Scripts\activate
+
+# Verificar que está activado (deberías ver (venv) al inicio de la línea de comandos)
 ```
 
 En Linux/Mac:
 
 ```bash
+# Crear el entorno virtual
 python3 -m venv venv
+
+# Activar el entorno virtual
 source venv/bin/activate
+
+# Verificar que está activado (deberías ver (venv) al inicio de la línea de comandos)
 ```
 
 3. Instalar todas las dependencias del proyecto:
@@ -39,9 +49,7 @@ pip install -r requirements.txt
 
 ## Ejecución
 
-1. Asegúrate de que el entorno virtual esté activado (verás `(venv)` al inicio de tu línea de comandos)
-
-2. Iniciar el servidor:
+1. Iniciar el servidor:
 
 ```bash
 python src/server.py
@@ -49,7 +57,7 @@ python src/server.py
 
 El servidor WebSocket estará corriendo en `Servidor WebSocket corriendo en ws://localhost:12345`
 
-3. Iniciar el cliente:
+2. Iniciar el cliente:
 
 Hay varias formas de abrir el cliente HTML:
 
@@ -72,7 +80,13 @@ c) Abriendo directamente el archivo:
 - Navega a la carpeta `src`
 - Haz doble clic en `client.html` para abrirlo en tu navegador predeterminado
 
-## Captura de Pantalla
+## Capturas de Pantalla
+
+-Al abrir el cliente debe pedirte el nombre de usuario:
+
+[![Captura-de-pantalla-2025-05-11-234900.png](https://i.postimg.cc/zDQYTzgS/Captura-de-pantalla-2025-05-11-234900.png)](https://postimg.cc/G9vfC1zH)
+
+-Demostración de mensajes entre usuarios:
 
 [![Captura-de-pantalla-2025-05-11-231937.png](https://i.postimg.cc/RZsFt54k/Captura-de-pantalla-2025-05-11-231937.png)](https://postimg.cc/sMWsFLBm)
 

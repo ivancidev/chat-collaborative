@@ -47,7 +47,34 @@ pip install -r requirements.txt
 python src/server.py
 ```
 
-El servidor WebSocket estará corriendo en `ws://localhost:12345`
+El servidor WebSocket estará corriendo en `Servidor WebSocket corriendo en ws://localhost:12345`
+
+3. Iniciar el cliente:
+
+Hay varias formas de abrir el cliente HTML:
+
+a) Usando Python (servidor HTTP simple):
+
+```bash
+python -m http.server 8000
+```
+
+Luego abre en tu navegador: `http://localhost:8000/src/client.html`
+
+b) Usando Live Server en VS Code:
+
+- Instala la extensión "Live Server"
+- Click derecho en `src/client.html`
+- Selecciona "Open with Live Server"
+
+c) Abriendo directamente el archivo:
+
+- Navega a la carpeta `src`
+- Haz doble clic en `client.html` para abrirlo en tu navegador predeterminado
+
+## Captura de Pantalla
+
+[![Captura-de-pantalla-2025-05-11-231937.png](https://i.postimg.cc/RZsFt54k/Captura-de-pantalla-2025-05-11-231937.png)](https://postimg.cc/sMWsFLBm)
 
 ## Notas
 
